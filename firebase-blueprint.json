@@ -1,0 +1,316 @@
+
+{
+  "entities": {
+    "Warehouse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Warehouse",
+      "type": "object",
+      "description": "Represents a physical warehouse with its configuration, personnel, and objectives.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Warehouse entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the warehouse."
+        },
+        "password": {
+          "type": "string",
+          "description": "Access code for the warehouse (Base64 encoded)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the warehouse."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Task": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Task",
+      "type": "object",
+      "description": "Represents a task within a warehouse, including its objective, assigned personnel, and current status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Task entity."
+        },
+        "warehouseId": {
+          "type": "string",
+          "description": "Reference to Warehouse. (Relationship: Warehouse 1:N Task)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the task."
+        },
+        "target": {
+          "type": "number",
+          "description": "The target quantity to be produced in the task."
+        },
+        "assignedStaff": {
+          "type": "array",
+          "description": "Personnel assigned to this task.",
+           "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "icon": { "type": "string" }
+            },
+            "required": ["id", "icon"]
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Not Started", "In Progress", "Completed"],
+          "description": "Current status of the task (e.g., 'Not Started', 'In Progress', 'Completed')."
+        },
+        "productivityId": {
+          "type": "string",
+          "description": "Reference to the base productivity definition used for this task."
+        },
+        "group": {
+            "type": "string",
+            "description": "The group the task belongs to (e.g., Inbound, Outbound)."
+        },
+        "unitOfMeasure": {
+            "type": "string",
+            "description": "The unit of measure for the target (e.g., unidades, cajas)."
+        }
+      },
+      "required": [
+        "id",
+        "warehouseId",
+        "name",
+        "target",
+        "productivityId"
+      ]
+    },
+    "Staff": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Staff",
+      "type": "object",
+      "description": "Represents a staff member, including their role and availability.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Staff entity."
+        },
+        "warehouseId": {
+          "type": "string",
+          "description": "Reference to Warehouse. (Relationship: Warehouse 1:N Staff)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the staff member."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role of the staff member (e.g., 'Picker', 'Packer', 'Forklift Operator')."
+        },
+        "availability": {
+          "type": "string",
+          "description": "Availability status of the staff member (e.g., 'Available', 'Absent')."
+        }
+      },
+      "required": [
+        "id",
+        "warehouseId",
+        "name",
+        "role"
+      ]
+    },
+    "Productivity": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Productivity",
+      "type": "object",
+      "description": "Represents the baseline productivity for a specific process within a warehouse.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Productivity entity."
+        },
+        "warehouseId": {
+          "type": "string",
+          "description": "Reference to Warehouse. (Relationship: Warehouse 1:N Productivity)"
+        },
+        "process": {
+          "type": "string",
+          "description": "The name of the process (e.g., 'Picking B2B FTW')."
+        },
+        "unitsPerHour": {
+          "type": "number",
+          "description": "The number of units that can be produced per hour for this process."
+        },
+        "equipmentLimit": {
+          "type": "number",
+          "description": "Limit of people per equipment."
+        }
+      },
+      "required": [
+        "id",
+        "warehouseId",
+        "process",
+        "unitsPerHour"
+      ]
+    },
+    "Shift": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Shift",
+      "type": "object",
+      "description": "Represents a shift within a warehouse.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Shift entity."
+        },
+        "warehouseId": {
+          "type": "string",
+          "description": "Reference to Warehouse. (Relationship: Warehouse 1:N Shift)"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time of the shift.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time of the shift.",
+          "format": "date-time"
+        },
+        "totalStaff": {
+          "type": "number",
+          "description": "Total staff assigned to shift."
+        },
+        "absentStaff": {
+          "type": "number",
+          "description": "Total staff absent from shift."
+        },
+        "breakTime": {
+          "type": "number",
+          "description": "Break time during shift."
+        },
+        "lunchTime": {
+          "type": "number",
+          "description": "Lunch time during shift."
+        }
+      },
+      "required": [
+        "id",
+        "warehouseId",
+        "startTime",
+        "endTime"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/warehouses/{warehouseId}",
+        "definition": {
+          "entityName": "Warehouse",
+          "schema": {
+            "$ref": "#/backend/entities/Warehouse"
+          },
+          "description": "Represents a physical warehouse. The 'warehouseId' is used to identify the warehouse. Access control is managed through the 'password'.",
+          "params": [
+            {
+              "name": "warehouseId",
+              "description": "The unique identifier for the warehouse."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/warehouses/{warehouseId}/tasks/{taskId}",
+        "definition": {
+          "entityName": "Task",
+          "schema": {
+            "$ref": "#/backend/entities/Task"
+          },
+          "description": "Represents a task within a warehouse. Includes denormalized 'warehouseId' for authorization independence.",
+          "params": [
+            {
+              "name": "warehouseId",
+              "description": "The unique identifier for the warehouse."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier for the task."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/warehouses/{warehouseId}/staff/{staffId}",
+        "definition": {
+          "entityName": "Staff",
+          "schema": {
+            "$ref": "#/backend/entities/Staff"
+          },
+          "description": "Represents a staff member within a warehouse. Includes denormalized 'warehouseId' for authorization independence.",
+          "params": [
+            {
+              "name": "warehouseId",
+              "description": "The unique identifier for the warehouse."
+            },
+            {
+              "name": "staffId",
+              "description": "The unique identifier for the staff member."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/warehouses/{warehouseId}/productivities/{productivityId}",
+        "definition": {
+          "entityName": "Productivity",
+          "schema": {
+            "$ref": "#/backend/entities/Productivity"
+          },
+          "description": "Represents the baseline productivity for a specific process within a warehouse. Includes denormalized 'warehouseId' for authorization independence.",
+          "params": [
+            {
+              "name": "warehouseId",
+              "description": "The unique identifier for the warehouse."
+            },
+            {
+              "name": "productivityId",
+              "description": "The unique identifier for the productivity metric."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/warehouses/{warehouseId}/shifts/{shiftId}",
+        "definition": {
+          "entityName": "Shift",
+          "schema": {
+            "$ref": "#/backend/entities/Shift"
+          },
+          "description": "Represents a shift within a warehouse. Includes denormalized 'warehouseId' for authorization independence.",
+          "params": [
+            {
+              "name": "warehouseId",
+              "description": "The unique identifier for the warehouse."
+            },
+            {
+              "name": "shiftId",
+              "description": "The unique identifier for the shift."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the ShiftWise Logistics application, focusing on warehouse, task, staff, productivity, and shift management.  It prioritizes authorization independence and supports the application's core features, including warehouse management, productivity-based planning, visual staff assignment, real-time capacity calculation, and report generation.\n\n**Authorization Independence and Security (CRITICAL):**\nTo ensure authorization independence, the `warehouseId` is denormalized into all subcollections (tasks, staff, productivity, shifts). This allows security rules to be written without needing to perform `get()` calls to parent documents, ensuring atomic operations and simplifying security logic.\n\n**Structural Segregation:**\nThe structure segregates data based on entity type into separate collections (warehouses, tasks, staff, productivities, shifts). This approach allows for homogeneous security postures within each collection, simplifying security rules and ensuring that documents with different access needs are not mixed.\n\n**Access Modeling:**\n*   **Warehouse:** Each warehouse is identified by a unique `id`.  Access to a warehouse and its associated data is controlled via the `password` property, a Base64 encoded string.\n*   **Tasks, Staff, Productivity, Shift:**  These entities are modeled as subcollections of the `warehouses` collection, establishing a clear ownership hierarchy. The `warehouseId` property in each document facilitates secure `list` operations and ensures that each entity belongs to a specific warehouse.\n\n**QAPs (Rules are not Filters):**\nThe structure enables secure `list` operations by using structural segregation and denormalization. For example, listing tasks for a specific warehouse can be done securely by querying the `/warehouses/{warehouseId}/tasks` collection, and security rules can enforce that the authenticated user has access to the warehouse.\n\n**Invariants:**\nThe structure supports the integrity of ownership by explicitly storing the `warehouseId` in each document within the subcollections. This ensures that each task, staff member, productivity metric, and shift is always associated with a specific warehouse."
+  }
+}

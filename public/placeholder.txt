@@ -1,0 +1,2 @@
+Este archivo se ha creado para generar la carpeta 'public'. 
+Por favor, suba su archivo logo.png a esta carpeta.
